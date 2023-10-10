@@ -77,7 +77,7 @@ namespace Assets.Scripts
             if (funcName == "set_action")
             {
                 AgentAction action = (AgentAction)Enum.Parse(typeof(AgentAction), argument);
-                GameManager.Instance.ActionHandler.MakeAction(action);
+                GameManager.Instance.MakeAction(action);
             }
 
             GameManager.Instance.ResponseRequested = true;
