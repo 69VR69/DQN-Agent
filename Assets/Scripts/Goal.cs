@@ -17,7 +17,7 @@ public class Goal : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Level Completed!");
-            //GameManager.Instance.LevelCompleted();
+            GameManager.Instance.IsDone = true;
         }
     }
 }
