@@ -986,8 +986,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lidarDistance: 5
-  _lidarResolutionX: 3
-  _lidarResolutionY: 3
+  _lidarResolutionX: 2
+  _lidarResolutionY: 2
   _lidarOffsetX: 2
   _lidarOffsetY: 2
 --- !u!54 &2017432438
