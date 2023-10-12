@@ -24,10 +24,10 @@ public class Agent : MonoBehaviour
     {
         get
         {
-            //if (_lidarPoints == null)
-            _lidarPoints = ComputeLidarPoints();
+            if (_lidarPoints == null)
+                _lidarPoints = ComputeLidarPoints();
 
-            return _lidarPoints;
+            return RotateLidarPoints(_lidarPoints);
         }
     }
 
@@ -52,7 +52,7 @@ public class Agent : MonoBehaviour
 
         lidarPoints = t.ToList();
 
-        return lidarPoints; //RotateLidarPoints(lidarPoints);
+        return lidarPoints;
     }
 
     private static List<Vector3> ComputeLidarLayer(int u, int ax, int ay, int resX, int resY, float Qx, float Qy, int z)
@@ -85,13 +85,29 @@ public class Agent : MonoBehaviour
 
     private List<List<Vector3>> RotateLidarPoints(List<List<Vector3>> lidarPoints)
     {
-        var rotationMatrix = Matrix4x4.Rotate(new(0, 90, 0, 0));
-        // Get the center of the lidar points
-        var center = new Vector3(lidarPoints[0].Count / 2, lidarPoints[0][0].y, lidarPoints[0][0].z);
+        // Rotate the points to match the player rotation in x and y axis
 
-        var rotatedLidarPoints = new List<List<Vector3>>();
+        // Calculate the rotation to apply to the points
+        Vector3 rotation = new(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
 
+        // Iterate over the points and apply the rotation
+        for (int i = 0; i < lidarPoints.Count; i++)
+            for (int j = 0; j < lidarPoints[i].Count; j++)
+            {
+                // Check if the point should not be rotated then continue, by checking if the point is aligned with the player view
+                var playerRotation = transform.rotation.eulerAngles.y;
+                var pointRotation = Quaternion.LookRotation(lidarPoints[i][j] - transform.position).eulerAngles.y;
+                if (Mathf.Abs(playerRotation - pointRotation) < 0.1f)
+                    continue;
 
+                // Rotate the point
+                lidarPoints[i][j] = Quaternion.Euler(rotation) * lidarPoints[i][j];
+            }
+
+        Debug.Log($"Lidar points rotated to {transform.rotation.eulerAngles.y}");
+        for (int i = 0; i < lidarPoints.Count; i++)
+            for (int j = 0; j < lidarPoints[i].Count; j++)
+                Debug.Log($"Lidar point {i},{j} is {lidarPoints[i][j]}");
 
         return lidarPoints;
     }
