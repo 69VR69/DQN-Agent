@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 
 using Unity.VisualScripting;
@@ -9,11 +10,13 @@ using UnityEngine;
 public class Agent : MonoBehaviour
 {
     [Header("Lidar")]
-    [SerializeField] private float _lidarDistance = 10f;
+    [SerializeField] private int _lidarDistance = 10;
     [SerializeField] private int _lidarResolutionX = 3;
     [SerializeField] private int _lidarResolutionY = 10;
-    [SerializeField] private float _lidarOffsetX = 0.1f;
-    [SerializeField] private float _lidarOffsetY = 45f;
+    [SerializeField] private int _lidarLayerZ = 3;
+    [SerializeField] private int _lidarOffsetZ = 3;
+    [SerializeField] private int _lidarAngleX = 10;
+    [SerializeField] private int _lidarAngleY = 8;
 
 
     private List<List<Vector3>> _lidarPoints;
@@ -30,62 +33,78 @@ public class Agent : MonoBehaviour
 
     private List<List<Vector3>> ComputeLidarPoints()
     {
-        // For each layer, compute the (x, y) coordinates of the lidar points
+        int u = _lidarDistance;
+        int ax = _lidarAngleX;
+        int ay = _lidarAngleY;
+        int resX = _lidarResolutionX - 1;
+        int resY = _lidarResolutionY - 1;
+
+        float Qx = Mathf.Abs(2 * Mathf.Tan(ax / 2));
+        float Qy = Mathf.Abs(2 * Mathf.Tan(ay / 2));
+
         var lidarPoints = new List<List<Vector3>>();
-        var nbPoints = _lidarResolutionX * _lidarResolutionY;
-        var distance = transform.position + new Vector3(_lidarDistance, 0, 0);
-        var xSize = _lidarResolutionX * _lidarOffsetX;
-        var ySize = _lidarResolutionY * _lidarOffsetY;
-        Vector3 center = new((xSize - _lidarOffsetX) / 2, (ySize - _lidarOffsetY) / 2, 0);
 
-        for (var i = 0; i < _lidarResolutionX; i++)
-        {
-            var layer = new List<Vector3>();
-            for (var j = 0; j < _lidarResolutionY; j++)
+        List<int> layers = Enumerable.Range(0, _lidarLayerZ).Where(i => i % _lidarOffsetZ == 0).ToList();
+
+        ParallelQuery<List<Vector3>> t = layers.AsParallel().Select(layers => ComputeLidarLayer(u, ax, ay, resX, resY, Qx, Qy, layers));
+
+        //TODO: Improve performances + points are placed as square starting from player, should be a projection instead
+
+        lidarPoints = t.ToList();
+
+        return lidarPoints; //RotateLidarPoints(lidarPoints);
+    }
+
+    private static List<Vector3> ComputeLidarLayer(int u, int ax, int ay, int resX, int resY, float Qx, float Qy, int z)
+    {
+        u += z;
+        int widht = (int)(u * Qx); //CD
+        int height = (int)(u * Qy); //BC
+
+        int offsetX = widht / resX;
+        int offsetY = height / resY;
+
+        Vector3 center = new(((float)widht) / 2, ((float)height) / 2, z);
+
+        Debug.Log($"Computing lidar points with u={u}, ax={ax}, ay={ay}, Qx={Qx}, Qy={Qy}, widht={widht}, height={height}, offsetX={offsetX}, offsetY={offsetY}, center={center}");
+
+        var layer = new List<Vector3>();
+
+        for (int x = 0; x <= widht; x += offsetX)
+            for (int y = 0; y <= height; y += offsetY)
             {
-                var x = i * _lidarOffsetX;
-                var y = j * _lidarOffsetY;
-                var point = new Vector3(x, y, 0) - center;
-                layer.Add(point);
+                // Find where to place the first point between 0 and width
+                Vector3 pos = new(x, y, z);
+                Debug.Log($"Adding point {pos}");
+
+                layer.Add(pos);
             }
-            lidarPoints.Add(layer);
-        }
 
-
-        return RotateLidarPoints(lidarPoints);
+        return layer;
     }
 
     private List<List<Vector3>> RotateLidarPoints(List<List<Vector3>> lidarPoints)
     {
-        // Get the current rotation of the agent
-        var rotation = transform.rotation.eulerAngles.z;
+        var rotationMatrix = Matrix4x4.Rotate(new(0, 90, 0, 0));
+        // Get the center of the lidar points
+        var center = new Vector3(lidarPoints[0].Count / 2, lidarPoints[0][0].y, lidarPoints[0][0].z);
 
-        // Rotate the lidar points
         var rotatedLidarPoints = new List<List<Vector3>>();
-        foreach (var layer in lidarPoints)
-        {
-            var rotatedLayer = new List<Vector3>();
-            foreach (var point in layer)
-            {
-                var rotatedPoint = Quaternion.Euler(0, 0, rotation) * point;
-                rotatedLayer.Add(rotatedPoint);
-            }
-            rotatedLidarPoints.Add(rotatedLayer);
-        }
-        return rotatedLidarPoints;
+
+
+
+        return lidarPoints;
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         foreach (var layer in LidarPoints)
-        {
             foreach (var point in layer)
             {
-                Debug.Log(point);
+                //Debug.Log(point);
                 Gizmos.color = Color.red;
-                Gizmos.DrawSphere(transform.position + point, 0.1f);
-                Gizmos.DrawLine(transform.position, transform.position + point);
+                Gizmos.DrawSphere(point, 0.1f);
+                Gizmos.DrawLine(transform.position, point);
             }
-        }
     }
 }
