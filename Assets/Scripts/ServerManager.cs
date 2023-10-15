@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -87,7 +88,7 @@ namespace Assets.Scripts
         {
             // Get the reward from the Agent
             float reward = GameManager.Instance.GetReward();
-            int state = GameManager.Instance.GetState();
+            Matrix<float> state = GameManager.Instance.GetState();
             bool isDone = GameManager.Instance.IsDone;
 
             // Format the message

@@ -10,7 +10,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; internal set; }
-
+    [SerializeField]
+    private Agent _agent;
     public ActionHandler ActionHandler { get; internal set; }
     public bool ResponseRequested { get; internal set; } = false;
     public bool IsDone { get; internal set; } = false;
@@ -29,17 +30,11 @@ public class GameManager : MonoBehaviour
         Debug.Log("TODO : Game Reset");
     }
 
-    public float GetReward()
-    {
-        Debug.Log("TODO : Get Reward");
-        return 1;
-    }
+    public Matrix<float> GetState() => 
+        _agent.GetComponent<Lidar>().GetLidarTrigger();
 
-    public int GetState()
-    {
-        Debug.Log("TODO : Get State");
-        return 0;
-    }
+    public float GetReward() =>
+        _agent.Reward;
 
     public void MakeAction(AgentAction action)
     {

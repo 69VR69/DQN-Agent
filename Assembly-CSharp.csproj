@@ -60,9 +60,11 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\ActionHandler.cs" />
     <Compile Include="Assets\Scripts\Obstacle.cs" />
+    <Compile Include="Assets\Scripts\Matrix.cs" />
     <Compile Include="Assets\Scripts\Goal.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Agent.cs" />
+    <Compile Include="Assets\Scripts\Lidar.cs" />
     <Compile Include="Assets\Scripts\ServerManager.cs" />
     <Compile Include="Assets\Scripts\AgentAction.cs" />
   </ItemGroup>
