@@ -15,5 +15,6 @@ namespace Assets.Scripts
         TURN_RIGHT = 4,
         TURN_LEFT = 5,
         JUMP = 6,
+        WAIT = 7,
     }
 }

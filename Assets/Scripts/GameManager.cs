@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Agent _agent;
     public ActionHandler ActionHandler { get; internal set; }
+    public ServerManager ServerManager { get; internal set; }
     public bool ResponseRequested { get; internal set; } = false;
     public bool IsDone { get; internal set; } = false;
     public bool IsActionDuring { get; internal set; } = false;
@@ -22,12 +23,14 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
         ActionHandler = GetComponent<ActionHandler>();
+        ServerManager = GetComponent<ServerManager>();
     }
 
     public void ResetGame()
     {
         IsDone = false;
         Debug.Log("TODO : Game Reset");
+        IsActionDuring = false;
     }
 
     public Matrix<float> GetState() => 
@@ -40,13 +43,11 @@ public class GameManager : MonoBehaviour
     {
         IsActionDuring = true;
         ActionHandler.MakeAction(action);
-        // Wait for the action to be done
-        StartCoroutine(WaitForAction());
+    }
 
-        IEnumerator WaitForAction()
-        {
-            yield return new WaitUntil(() => !IsActionDuring);
-            ResponseRequested = true;
-        }
+    public IEnumerator WaitForAction()
+    {
+        yield return new WaitUntil(() => !IsActionDuring);
+        _ = ServerManager.ModelSend();
     }
 }

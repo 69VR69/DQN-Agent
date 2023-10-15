@@ -60,6 +60,8 @@ public class ActionHandler : MonoBehaviour
             case AgentAction.JUMP:
                 Jump();
                 break;
+                case AgentAction.WAIT:
+                    break;
             default:
                 break;
         }

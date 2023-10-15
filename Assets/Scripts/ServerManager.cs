@@ -68,12 +68,12 @@ namespace Assets.Scripts
         {
             string message = (await ReceiveAsync()).Trim();
 
-            if (message == "reset")
-                GameManager.Instance.ResetGame();
+            string[] splittedMessage = message?.Split(':') ?? new string[] { message };
+            string funcName = splittedMessage?[0];
+            string argument = splittedMessage?[1];
 
-            string[] splittedMessage = message.Split(':');
-            string funcName = splittedMessage[0];
-            string argument = splittedMessage[1];
+            if (funcName == "reset")
+                GameManager.Instance.ResetGame();
 
             if (funcName == "set_action")
             {
@@ -82,6 +82,8 @@ namespace Assets.Scripts
             }
 
             GameManager.Instance.ResponseRequested = true;
+            // Wait for the action to be done
+            StartCoroutine(GameManager.Instance.WaitForAction());
         }
 
         public async Task ModelSend()
@@ -111,9 +113,12 @@ namespace Assets.Scripts
         public async Task<string> ReceiveAsync()
         {
             Debug.Log("Receiving...");
-            var data = new byte[256];
-            var bytes = await _stream.ReadAsync(data, 0, data.Length);
-            var message = Encoding.ASCII.GetString(data, 0, bytes);
+            // Read until the first pipe (|) character is encountered
+            var buffer = new byte[16];
+            var byteCount = await _stream.ReadAsync(buffer, 0, buffer.Length);
+            var message = Encoding.ASCII.GetString(buffer, 0, byteCount);
+            // Get the message without the pipe character
+            message = message.Substring(0, message.IndexOf("|", StringComparison.Ordinal));
             Debug.Log("Received: " + message);
             return message;
         }
