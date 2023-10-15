@@ -24,10 +24,12 @@ public class Agent : MonoBehaviour
     {
         get
         {
-            if (_lidarPoints == null)
-                _lidarPoints = ComputeLidarPoints();
+            // if (_lidarPoints == null)
+            _lidarPoints = ComputeLidarPoints();
 
-            return RotateLidarPoints(_lidarPoints);
+            //_lidarPoints = RotateLidarPoints(_lidarPoints);
+
+            return _lidarPoints;
         }
     }
 
@@ -46,7 +48,7 @@ public class Agent : MonoBehaviour
 
         List<int> layers = Enumerable.Range(0, _lidarLayerZ).Where(i => i % _lidarOffsetZ == 0).ToList();
 
-        ParallelQuery<List<Vector3>> t = layers.AsParallel().Select(layers => ComputeLidarLayer(u, ax, ay, resX, resY, Qx, Qy, layers));
+        ParallelQuery<List<Vector3>> t = layers.AsParallel().Select(layers => ComputeLidarLayer(u + layers, ax, ay, resX, resY, Qx, Qy));
 
         //TODO: Improve performances + points are placed as square starting from player, should be a projection instead
 
@@ -55,18 +57,17 @@ public class Agent : MonoBehaviour
         return lidarPoints;
     }
 
-    private static List<Vector3> ComputeLidarLayer(int u, int ax, int ay, int resX, int resY, float Qx, float Qy, int z)
+    private static List<Vector3> ComputeLidarLayer(int distance, int ax, int ay, int resX, int resY, float Qx, float Qy)
     {
-        u += z;
-        int widht = (int)(u * Qx); //CD
-        int height = (int)(u * Qy); //BC
+        int widht = (int)(distance * Qx); //CD
+        int height = (int)(distance * Qy); //BC
 
         int offsetX = widht / resX;
         int offsetY = height / resY;
 
-        Vector3 center = new(((float)widht) / 2, ((float)height) / 2, z);
+        Vector3 center = new(((float)widht) / 2, ((float)height) / 2, distance);
 
-        Debug.Log($"Computing lidar points with u={u}, ax={ax}, ay={ay}, Qx={Qx}, Qy={Qy}, widht={widht}, height={height}, offsetX={offsetX}, offsetY={offsetY}, center={center}");
+        Debug.Log($"Computing lidar points with u={distance}, ax={ax}, ay={ay}, Qx={Qx}, Qy={Qy}, widht={widht}, height={height}, offsetX={offsetX}, offsetY={offsetY}, center={center}");
 
         var layer = new List<Vector3>();
 
@@ -74,7 +75,7 @@ public class Agent : MonoBehaviour
             for (int y = 0; y <= height; y += offsetY)
             {
                 // Find where to place the first point between 0 and width
-                Vector3 pos = new(x, y, z);
+                Vector3 pos = new(x, x, y);
                 Debug.Log($"Adding point {pos}");
 
                 layer.Add(pos);
