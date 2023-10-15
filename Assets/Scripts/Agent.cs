@@ -10,13 +10,16 @@ using UnityEngine;
 public class Agent : MonoBehaviour
 {
     [Header("Lidar")]
-    [SerializeField] private int _lidarDistance = 10;
+    [SerializeField] private float _lidarDistance = 10;
     [SerializeField] private int _lidarResolutionX = 3;
     [SerializeField] private int _lidarResolutionY = 10;
     [SerializeField] private int _lidarLayerZ = 3;
-    [SerializeField] private int _lidarOffsetZ = 3;
-    [SerializeField] private int _lidarAngleX = 10;
-    [SerializeField] private int _lidarAngleY = 8;
+    [SerializeField] private float _lidarOffsetZ = 3;
+    [SerializeField] private float _lidarAngleX = 10;
+    [SerializeField] private float _lidarAngleY = 8;
+
+    private Vector3 _agentPosition;
+    private Quaternion _agentRotation;
 
 
     private List<List<Vector3>> _lidarPoints;
@@ -27,90 +30,56 @@ public class Agent : MonoBehaviour
             // if (_lidarPoints == null)
             _lidarPoints = ComputeLidarPoints();
 
-            //_lidarPoints = RotateLidarPoints(_lidarPoints);
-
             return _lidarPoints;
         }
     }
 
+    private void Start()
+    {
+        _agentPosition = transform.position;
+        _agentRotation = transform.rotation;
+    }
+
     private List<List<Vector3>> ComputeLidarPoints()
     {
-        int u = _lidarDistance;
-        int ax = _lidarAngleX;
-        int ay = _lidarAngleY;
-        int resX = _lidarResolutionX - 1;
-        int resY = _lidarResolutionY - 1;
+        List<int> layers =
+            Enumerable.Range(0, _lidarLayerZ)
+            .ToList();
 
-        float Qx = Mathf.Abs(2 * Mathf.Tan(ax / 2));
-        float Qy = Mathf.Abs(2 * Mathf.Tan(ay / 2));
+        float ax = Mathf.Deg2Rad * _lidarAngleX;
+        float ay = Mathf.Deg2Rad * _lidarAngleY;
+        Vector2 Q = new(Mathf.Tan(ax), Mathf.Tan(ay));
+        Vector2 resolution = new(_lidarResolutionX - 1, _lidarResolutionY - 1);
 
-        var lidarPoints = new List<List<Vector3>>();
+        Debug.Log($"Lidar resolution is {resolution}, layers {string.Join(",", layers)}");
 
-        List<int> layers = Enumerable.Range(0, _lidarLayerZ).Where(i => i % _lidarOffsetZ == 0).ToList();
-
-        ParallelQuery<List<Vector3>> t = layers.AsParallel().Select(layers => ComputeLidarLayer(u + layers, ax, ay, resX, resY, Qx, Qy));
-
-        //TODO: Improve performances + points are placed as square starting from player, should be a projection instead
-
-        lidarPoints = t.ToList();
+        List<List<Vector3>> lidarPoints = new();
+        lidarPoints = layers
+            .AsParallel()
+            .Select(layers => ComputeLidarLayer(_lidarDistance + (layers * _lidarOffsetZ), resolution, Q))
+            .ToList();
 
         return lidarPoints;
     }
 
-    private static List<Vector3> ComputeLidarLayer(int distance, int ax, int ay, int resX, int resY, float Qx, float Qy)
+    private List<Vector3> ComputeLidarLayer(float distance, Vector2 resolution, Vector2 Q)
     {
-        int widht = (int)(distance * Qx); //CD
-        int height = (int)(distance * Qy); //BC
-
-        int offsetX = widht / resX;
-        int offsetY = height / resY;
-
-        Vector3 center = new(((float)widht) / 2, ((float)height) / 2, distance);
-
-        Debug.Log($"Computing lidar points with u={distance}, ax={ax}, ay={ay}, Qx={Qx}, Qy={Qy}, widht={widht}, height={height}, offsetX={offsetX}, offsetY={offsetY}, center={center}");
-
         var layer = new List<Vector3>();
 
-        for (int x = 0; x <= widht; x += offsetX)
-            for (int y = 0; y <= height; y += offsetY)
-            {
-                // Find where to place the first point between 0 and width
-                Vector3 pos = new(x, x, y);
-                Debug.Log($"Adding point {pos}");
+        Q *= distance;
 
-                layer.Add(pos);
+        for (int i = 0; i < _lidarResolutionX; i++)
+            for (int j = 0; j < _lidarResolutionY; j++)
+            {
+                var x = i - resolution.x / 2;
+                var y = j - resolution.y / 2;
+
+                var point = new Vector3(x * Q.x, y * Q.y, distance);
+                Debug.Log($"Lidar point {i},{j} is {point}");
+                layer.Add(point);
             }
 
         return layer;
-    }
-
-    private List<List<Vector3>> RotateLidarPoints(List<List<Vector3>> lidarPoints)
-    {
-        // Rotate the points to match the player rotation in x and y axis
-
-        // Calculate the rotation to apply to the points
-        Vector3 rotation = new(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
-
-        // Iterate over the points and apply the rotation
-        for (int i = 0; i < lidarPoints.Count; i++)
-            for (int j = 0; j < lidarPoints[i].Count; j++)
-            {
-                // Check if the point should not be rotated then continue, by checking if the point is aligned with the player view
-                var playerRotation = transform.rotation.eulerAngles.y;
-                var pointRotation = Quaternion.LookRotation(lidarPoints[i][j] - transform.position).eulerAngles.y;
-                if (Mathf.Abs(playerRotation - pointRotation) < 0.1f)
-                    continue;
-
-                // Rotate the point
-                lidarPoints[i][j] = Quaternion.Euler(rotation) * lidarPoints[i][j];
-            }
-
-        Debug.Log($"Lidar points rotated to {transform.rotation.eulerAngles.y}");
-        for (int i = 0; i < lidarPoints.Count; i++)
-            for (int j = 0; j < lidarPoints[i].Count; j++)
-                Debug.Log($"Lidar point {i},{j} is {lidarPoints[i][j]}");
-
-        return lidarPoints;
     }
 
     private void OnDrawGizmos()
@@ -121,7 +90,13 @@ public class Agent : MonoBehaviour
                 //Debug.Log(point);
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere(point, 0.1f);
-                Gizmos.DrawLine(transform.position, point);
             }
+
+        // Draw line only for last layer
+        foreach (var point in LidarPoints.Last())
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, point);
+        }
     }
 }

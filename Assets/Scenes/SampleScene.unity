@@ -860,14 +860,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017432432}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32998326, y: 0.67923373, z: -0.11590666, w: 0.6452273}
-  m_LocalPosition: {x: -0.0000000036066137, y: 2.94, z: -0.368}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 963194228}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 35.682, y: 99.96, z: 21.576}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2017432437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -880,12 +880,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 017dddc39165e7447b3f0d1daa43535e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lidarDistance: 3
-  _lidarResolutionX: 2
-  _lidarResolutionY: 2
-  _lidarLayerZ: 1
-  _lidarOffsetZ: 2
-  _lidarAngleX: 5
+  _lidarDistance: 2
+  _lidarResolutionX: 10
+  _lidarResolutionY: 10
+  _lidarLayerZ: 10
+  _lidarOffsetZ: 1
+  _lidarAngleX: 15
   _lidarAngleY: 5
 --- !u!54 &2017432438
 Rigidbody:
