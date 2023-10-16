@@ -1,28 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.PeerToPeer.Collaboration;
-using System.Numerics;
 
 using UnityEngine;
 
 public class Agent : MonoBehaviour
 {
     public float Reward { get; internal set; }
-    private RigidBody rb;
+    private Rigidbody rb;
 
     private void Start()
     {
-        rb = GetComponent<RigidBody>();
+        rb = GetComponent<Rigidbody>();
     }
 
-    public void Jump(float jumpForce) =>
+    public void Jump(float jumpForce)
+    {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
 
-    public void Move(Vector3 movement) =>
-        rb.velocity = movement * Time.fixedDeltaTime;
-
+    public void Move(Vector3 movement)
+    {
+        rb.AddForce(movement, ForceMode.Impulse);
+    }
 
     public void Rotate(Quaternion rotation)
-        => rb.rotation += rotation;
+    {
+        Quaternion newRotation = transform.rotation * rotation;
+        rb.MoveRotation(newRotation);
+    }
 }

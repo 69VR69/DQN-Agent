@@ -70,20 +70,21 @@ namespace Assets.Scripts
 
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
             string funcName = splittedMessage?[0];
-            string argument = splittedMessage?[1];
+
+            GameManager.Instance.ResponseRequested = true;
+            Debug.Log($"2/ Function: {funcName}");
+            GameManager.Instance.StartWait();
+            Debug.Log($"3/ ResponseRequested: {GameManager.Instance.ResponseRequested}");
 
             if (funcName == "reset")
                 GameManager.Instance.ResetGame();
 
             if (funcName == "set_action")
             {
+                string argument = splittedMessage?[1];
                 AgentAction action = (AgentAction)Enum.Parse(typeof(AgentAction), argument);
                 GameManager.Instance.MakeAction(action);
             }
-
-            GameManager.Instance.ResponseRequested = true;
-            // Wait for the action to be done
-            StartCoroutine(GameManager.Instance.WaitForAction());
         }
 
         public async Task ModelSend()

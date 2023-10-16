@@ -41,13 +41,26 @@ public class GameManager : MonoBehaviour
 
     public void MakeAction(AgentAction action)
     {
+        Debug.Log("Make Action");
         IsActionDuring = true;
         ActionHandler.MakeAction(action);
     }
 
+    public void StartWait()
+    {
+        Debug.Log("Start Wait");
+        var coroutine = WaitForAction();
+        Debug.Log("Start Coroutine");
+        StartCoroutine(coroutine);
+        Debug.Log("End Wait");
+    }
+
     public IEnumerator WaitForAction()
     {
-        yield return new WaitUntil(() => !IsActionDuring);
+        Debug.Log("start coroutine");
+        yield return new WaitForSeconds(1f);
+        //yield return new WaitUntil(() => !IsActionDuring);
+        Debug.Log("stop coroutine");
         _ = ServerManager.ModelSend();
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
 
 using Assets.Scripts;
 
@@ -30,10 +29,10 @@ public class ActionHandler : MonoBehaviour
         _agent.Jump(_jumpForce);
     }
 
-    public void Rotate(Quaternion direction)
+    public void Rotate(Vector3 direction)
     {
         Debug.Log($"Rotate to {direction}");
-        _agent.Rotate(direction * _rotationSpeed);
+        _agent.Rotate(Quaternion.Euler(direction * _rotationSpeed));
     }
 
     public void MakeAction(AgentAction action)
@@ -53,10 +52,10 @@ public class ActionHandler : MonoBehaviour
                 Move(Vector3.left);
                 break;
             case AgentAction.TURN_RIGHT:
-                Rotate(new Quaternion(Vector3.Zero, 1));
+                Rotate(Vector3.up);
                 break;
             case AgentAction.TURN_LEFT:
-                Rotate(new Quaternion(Vector3.Zero, -1));
+                Rotate(Vector3.down);
                 break;
             case AgentAction.JUMP:
                 Jump();
