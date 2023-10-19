@@ -22,6 +22,11 @@ namespace Assets.Scripts
         private const int Port = 8888;
         private const string Ip = "127.0.0.1";
 
+        public GameManager GameManager { get; internal set; }
+
+        private void Start() => 
+            Debug.Log("Press space to start server");
+
         private async void StartServer()
         {
             Debug.Log("Starting server...");
@@ -56,7 +61,7 @@ namespace Assets.Scripts
 
             if (_isServerStarted && _isConnected)
             {
-                if (GameManager.Instance.ResponseRequested)
+                if (GameManager.ResponseRequested)
                     return;
 
                 if (_stream.DataAvailable)
@@ -71,28 +76,28 @@ namespace Assets.Scripts
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
             string funcName = splittedMessage?[0];
 
-            GameManager.Instance.ResponseRequested = true;
+            GameManager.ResponseRequested = true;
             Debug.Log($"2/ Function: {funcName}");
-            GameManager.Instance.StartWait();
-            Debug.Log($"3/ ResponseRequested: {GameManager.Instance.ResponseRequested}");
+            GameManager.StartWait();
+            Debug.Log($"3/ ResponseRequested: {GameManager.ResponseRequested}");
 
             if (funcName == "reset")
-                GameManager.Instance.ResetGame();
+                GameManager.ResetGame();
 
             if (funcName == "set_action")
             {
                 string argument = splittedMessage?[1];
                 AgentAction action = (AgentAction)Enum.Parse(typeof(AgentAction), argument);
-                GameManager.Instance.MakeAction(action);
+                GameManager.MakeAction(action);
             }
         }
 
         public async Task ModelSend()
         {
             // Get the reward from the Agent
-            float reward = GameManager.Instance.GetReward();
-            Matrix<float> state = GameManager.Instance.GetState();
-            bool isDone = GameManager.Instance.IsDone;
+            float reward = GameManager.GetReward();
+            Matrix<float> state = GameManager.GetState();
+            bool isDone = GameManager.IsDone;
 
             // Format the message
             string message = $"{reward.ToString(CultureInfo.InvariantCulture)}:{state}:{isDone}";
@@ -100,7 +105,7 @@ namespace Assets.Scripts
             // Send the message
             await SendAsync(message);
 
-            GameManager.Instance.ResponseRequested = false;
+            GameManager.ResponseRequested = false;
         }
 
         public async Task SendAsync(string message)

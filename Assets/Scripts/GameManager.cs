@@ -23,7 +23,8 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
         ActionHandler = GetComponent<ActionHandler>();
-        ServerManager = GetComponent<ServerManager>();
+        ServerManager = GetComponentInChildren<ServerManager>();
+        ServerManager.GameManager = this;
     }
 
     public void ResetGame()
@@ -48,19 +49,17 @@ public class GameManager : MonoBehaviour
 
     public void StartWait()
     {
-        Debug.Log("Start Wait");
-        var coroutine = WaitForAction();
         Debug.Log("Start Coroutine");
-        StartCoroutine(coroutine);
-        Debug.Log("End Wait");
+        StartCoroutine(WaitForAction());
+        Debug.Log("End Coroutine");
     }
 
-    public IEnumerator WaitForAction()
+    IEnumerator WaitForAction()
     {
         Debug.Log("start coroutine");
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1);
         //yield return new WaitUntil(() => !IsActionDuring);
         Debug.Log("stop coroutine");
-        _ = ServerManager.ModelSend();
+        //_ = ServerManager.ModelSend();
     }
 }
