@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Assets.Scripts;
 
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 [RequireComponent(typeof(ActionHandler))]
 public class GameManager : MonoBehaviour
@@ -14,7 +15,7 @@ public class GameManager : MonoBehaviour
     private Agent _agent;
     public ActionHandler ActionHandler { get; internal set; }
     public ServerManager ServerManager { get; internal set; }
-    public bool ResponseRequested { get; internal set; } = false;
+    public bool IsResponseRequested { get; internal set; } = false;
     public bool IsDone { get; internal set; } = false;
     public bool IsActionDuring { get; internal set; } = false;
 
@@ -29,12 +30,13 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
+        IsActionDuring = true;
         IsDone = false;
         Debug.Log("TODO : Game Reset");
         IsActionDuring = false;
     }
 
-    public Matrix<float> GetState() => 
+    public Matrix<float> GetState() =>
         _agent.GetComponent<Lidar>().GetLidarTrigger();
 
     public float GetReward() =>
@@ -42,24 +44,16 @@ public class GameManager : MonoBehaviour
 
     public void MakeAction(AgentAction action)
     {
-        Debug.Log("Make Action");
         IsActionDuring = true;
+        Debug.Log("Make Action");
         ActionHandler.MakeAction(action);
     }
 
-    public void StartWait()
+    private void Update()
     {
-        Debug.Log("Start Coroutine");
-        StartCoroutine(WaitForAction());
-        Debug.Log("End Coroutine");
-    }
-
-    IEnumerator WaitForAction()
-    {
-        Debug.Log("start coroutine");
-        yield return new WaitForSeconds(1);
-        //yield return new WaitUntil(() => !IsActionDuring);
-        Debug.Log("stop coroutine");
-        //_ = ServerManager.ModelSend();
+        if (IsResponseRequested && !IsActionDuring)
+        {
+            _ = ServerManager.ModelSend();
+        }
     }
 }

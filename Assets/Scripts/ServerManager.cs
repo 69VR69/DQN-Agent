@@ -24,7 +24,7 @@ namespace Assets.Scripts
 
         public GameManager GameManager { get; internal set; }
 
-        private void Start() => 
+        private void Start() =>
             Debug.Log("Press space to start server");
 
         private async void StartServer()
@@ -46,9 +46,9 @@ namespace Assets.Scripts
         private async Task StopServerAsync()
         {
             Debug.Log("Stopping server...");
-            _stream.Close();
-            _client.Close();
-            _listener.Stop();
+            _stream?.Close();
+            _client?.Close();
+            _listener?.Stop();
             _isServerStarted = false;
             await Task.Delay(1000);
             Debug.Log("Server stopped");
@@ -61,7 +61,7 @@ namespace Assets.Scripts
 
             if (_isServerStarted && _isConnected)
             {
-                if (GameManager.ResponseRequested)
+                if (GameManager.IsResponseRequested)
                     return;
 
                 if (_stream.DataAvailable)
@@ -76,10 +76,8 @@ namespace Assets.Scripts
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
             string funcName = splittedMessage?[0];
 
-            GameManager.ResponseRequested = true;
-            Debug.Log($"2/ Function: {funcName}");
-            GameManager.StartWait();
-            Debug.Log($"3/ ResponseRequested: {GameManager.ResponseRequested}");
+            GameManager.IsResponseRequested = true;
+
 
             if (funcName == "reset")
                 GameManager.ResetGame();
@@ -105,7 +103,7 @@ namespace Assets.Scripts
             // Send the message
             await SendAsync(message);
 
-            GameManager.ResponseRequested = false;
+            GameManager.IsResponseRequested = false;
         }
 
         public async Task SendAsync(string message)
