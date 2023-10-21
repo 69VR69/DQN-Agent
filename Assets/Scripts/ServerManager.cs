@@ -122,7 +122,6 @@ namespace Assets.Scripts
             var byteCount = await _stream.ReadAsync(buffer, 0, buffer.Length);
             var message = Encoding.ASCII.GetString(buffer, 0, byteCount);
             // Get the message without the pipe character
-            message = message.Substring(0, message.IndexOf("|", StringComparison.Ordinal));
             Debug.Log("Received: " + message);
             return message;
         }

@@ -40,10 +40,10 @@ namespace Assets.Scripts
             if (Input.GetKeyDown(KeyCode.U))
             {
                 var lidarTrigger = GetLidarTrigger();
-                Debug.Log($"Lidar trigger is {string.Join(",", lidarTrigger.SelectMany(x => x))}");
+                Debug.Log($"Lidar trigger is {lidarTrigger}");
             }
 
-            if(Input.GetKeyDown(KeyCode.I))
+            if (Input.GetKeyDown(KeyCode.I))
             {
                 _lidarPoints = ComputeLidarPoints();
             }
@@ -58,7 +58,7 @@ namespace Assets.Scripts
             float ax = Mathf.Deg2Rad * _lidarAngleX;
             float ay = Mathf.Deg2Rad * _lidarAngleY;
             Vector2 Q = new(Mathf.Tan(ax), Mathf.Tan(ay));
-            Vector2 resolution = new(_lidarResolutionX, _lidarResolutionY);
+            Vector2 resolution = new(_lidarResolutionX - 1, _lidarResolutionY - 1);
 
             Debug.Log($"Lidar resolution is {resolution}, layers {string.Join(",", layers)}");
 
