@@ -39,8 +39,12 @@ public class GameManager : MonoBehaviour
     public Matrix<float> GetState() =>
         _agent.GetComponent<Lidar>().GetLidarTrigger();
 
-    public float GetReward() =>
-        _agent.Reward;
+    public float GetReward()
+    {
+        Debug.Log("Reward func");
+        Debug.Log("Reward => : " + _agent.ToString());
+        return _agent.Reward;
+    }
 
     public void MakeAction(AgentAction action)
     {
@@ -51,6 +55,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log($"is response requested : {IsResponseRequested} and is action during : {IsActionDuring}");
         if (IsResponseRequested && !IsActionDuring)
         {
             _ = ServerManager.ModelSend();

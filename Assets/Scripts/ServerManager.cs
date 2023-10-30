@@ -78,7 +78,6 @@ namespace Assets.Scripts
 
             GameManager.IsResponseRequested = true;
 
-
             if (funcName == "reset")
                 GameManager.ResetGame();
 
@@ -88,22 +87,31 @@ namespace Assets.Scripts
                 AgentAction action = (AgentAction)Enum.Parse(typeof(AgentAction), argument);
                 GameManager.MakeAction(action);
             }
+
+            if (funcName == "get_state")
+                await SendAsync(GameManager.GetState().ToString());
         }
 
         public async Task ModelSend()
         {
+            Debug.Log("ModelSend");
+            GameManager.IsResponseRequested = false;
+
             // Get the reward from the Agent
             float reward = GameManager.GetReward();
+            Debug.Log($"Reward : {reward}");
             Matrix<float> state = GameManager.GetState();
+            Debug.Log($"State : {state.ToString()}");
             bool isDone = GameManager.IsDone;
+            Debug.Log($"IsDone : {isDone}");
 
             // Format the message
             string message = $"{reward.ToString(CultureInfo.InvariantCulture)}:{state}:{isDone}";
 
+            Debug.Log($"Message : {message}");
             // Send the message
             await SendAsync(message);
 
-            GameManager.IsResponseRequested = false;
         }
 
         public async Task SendAsync(string message)
@@ -117,11 +125,9 @@ namespace Assets.Scripts
         public async Task<string> ReceiveAsync()
         {
             Debug.Log("Receiving...");
-            // Read until the first pipe (|) character is encountered
-            var buffer = new byte[16];
+            var buffer = new byte[21];
             var byteCount = await _stream.ReadAsync(buffer, 0, buffer.Length);
             var message = Encoding.ASCII.GetString(buffer, 0, byteCount);
-            // Get the message without the pipe character
             Debug.Log("Received: " + message);
             return message;
         }

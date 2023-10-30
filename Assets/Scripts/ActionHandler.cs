@@ -66,4 +66,25 @@ public class ActionHandler : MonoBehaviour
                 break;
         }
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.J))
+            MakeAction(AgentAction.JUMP);
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+            MakeAction(AgentAction.MOVE_DOWN);
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+            MakeAction(AgentAction.MOVE_UP);
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            MakeAction(AgentAction.MOVE_LEFT);
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+            MakeAction(AgentAction.MOVE_RiGHT);
+
+        if (Input.GetKeyDown(KeyCode.A))
+            MakeAction(AgentAction.TURN_LEFT);
+        if (Input.GetKeyDown(KeyCode.E))
+            MakeAction(AgentAction.TURN_RIGHT);
+
+    }
 }
