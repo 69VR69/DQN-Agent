@@ -49,6 +49,8 @@ namespace Assets.Scripts
             }
         }
 
+        public void UpdateLidar() => _lidarPoints = ComputeLidarPoints();
+
         private List<List<Vector3>> ComputeLidarPoints()
         {
             List<int> layers =
