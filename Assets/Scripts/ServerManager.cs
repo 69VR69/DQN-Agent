@@ -73,6 +73,9 @@ namespace Assets.Scripts
         {
             string message = (await ReceiveAsync()).Trim();
 
+            if(string.IsNullOrWhiteSpace(message))
+                return;
+
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
             string funcName = splittedMessage?[0];
 
@@ -101,12 +104,12 @@ namespace Assets.Scripts
             float reward = GameManager.GetReward();
             Debug.Log($"Reward : {reward}");
             Matrix<float> state = GameManager.GetState();
-            Debug.Log($"State : {state.ToString()}");
+            Debug.Log($"State : {state}");
             bool isDone = GameManager.IsDone;
             Debug.Log($"IsDone : {isDone}");
 
             // Format the message
-            string message = $"{reward.ToString(CultureInfo.InvariantCulture)}:{state}:{isDone}";
+            string message = $"{reward.ToString(CultureInfo.InvariantCulture)}:{state}:{(isDone ? "1" : "0")}";
 
             Debug.Log($"Message : {message}");
             // Send the message

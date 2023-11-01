@@ -21,7 +21,6 @@ public class Agent : MonoBehaviour
         lastRotation = transform.eulerAngles;
     }
 
-    // TODO : debug the movement (continious movement)
     public void Jump(float jumpForce)
     {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
