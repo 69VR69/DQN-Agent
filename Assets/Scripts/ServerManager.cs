@@ -73,7 +73,7 @@ namespace Assets.Scripts
         {
             string message = (await ReceiveAsync()).Trim();
 
-            if(string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace(message))
                 return;
 
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
@@ -111,7 +111,7 @@ namespace Assets.Scripts
             // Format the message
             string message = $"{reward.ToString(CultureInfo.InvariantCulture)}:{state}:{(isDone ? "1" : "0")}";
 
-            Debug.Log($"Message : {message}");
+            //Debug.Log($"Message : {message}");
             // Send the message
             await SendAsync(message);
 
@@ -128,9 +128,22 @@ namespace Assets.Scripts
         public async Task<string> ReceiveAsync()
         {
             Debug.Log("Receiving...");
-            var buffer = new byte[21];
-            var byteCount = await _stream.ReadAsync(buffer, 0, buffer.Length);
-            var message = Encoding.ASCII.GetString(buffer, 0, byteCount);
+            string message;
+
+            // Read from the stream until the delimiter '\n' is found
+            do
+            {
+                var buffer = new List<byte>();
+                var data = new byte[1];
+                while (data[0] != '\n' && buffer.Count > 0)
+                {
+                    _stream.Read(data, 0, data.Length);
+                    buffer.AddRange(data);
+                }
+                // Convert the data to a string
+                message = Encoding.ASCII.GetString(buffer.ToArray());
+            } while (string.IsNullOrWhiteSpace(message));
+
             Debug.Log("Received: " + message);
             return message;
         }

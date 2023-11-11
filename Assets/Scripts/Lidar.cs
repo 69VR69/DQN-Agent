@@ -136,7 +136,7 @@ namespace Assets.Scripts
             return lidarTrigger;
         }
 
-        private void OnDrawGizmos()
+        private void OnDrawGizmosSelected()
         {
             float maxDistance = _lidarDistance + (_lidarLayerZ * _lidarOffsetZ);
             foreach (var layer in LidarPoints)
