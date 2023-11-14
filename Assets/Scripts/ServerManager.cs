@@ -12,66 +12,66 @@ namespace Assets.Scripts
 {
     public class ServerManager : MonoBehaviour
     {
-        private TcpListener _listener;
-        private TcpClient _client;
-        private NetworkStream _stream;
+        protected TcpListener _listener;
+        protected TcpClient _client;
+        protected NetworkStream _stream;
 
-        private bool _isServerStarted = false;
-        private bool _isConnected = false;
+        protected bool _isServerStarted = false;
+        protected bool _isConnected = false;
 
-        private const int Port = 8888;
-        private const string Ip = "127.0.0.1";
+        protected const int Port = 8888;
+        protected const string Ip = "127.0.0.1";
 
         public GameManager GameManager { get; internal set; }
 
-        private void Start() =>
+        protected void Start() =>
             Debug.Log("Press space to start server");
 
-        private async void StartServer()
+        protected virtual void StartServer()
         {
             Debug.Log("Starting server...");
             if (_isServerStarted)
-                await StopServerAsync();
+                StopServerAsync();
 
             _listener = new TcpListener(IPAddress.Parse(Ip), Port);
             _listener.Start();
             _isServerStarted = true;
             Debug.Log("Server started");
 
-            _client = await _listener.AcceptTcpClientAsync();
+            _client = Task.Run(async () => await _listener.AcceptTcpClientAsync()).Result;
             _isConnected = true;
             _stream = _client.GetStream();
         }
 
-        private async Task StopServerAsync()
+        protected virtual void StopServerAsync()
         {
             Debug.Log("Stopping server...");
             _stream?.Close();
             _client?.Close();
             _listener?.Stop();
             _isServerStarted = false;
-            await Task.Delay(1000);
+            Task.Delay(1000);
             Debug.Log("Server stopped");
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space))
                 StartServer();
 
             if (_isServerStarted && _isConnected)
             {
-                if (GameManager.IsResponseRequested)
+                if (GameManager.IsFullAnswerRequested)
                     return;
 
                 if (_stream.DataAvailable)
-                    Task.Run(async () => await ModelReceive());
+                    ModelReceive();
             }
         }
 
-        public async Task ModelReceive()
+        public virtual void ModelReceive()
         {
-            string message = (await ReceiveAsync()).Trim();
+            string message = (Receive()).Trim();
 
             if (string.IsNullOrWhiteSpace(message))
                 return;
@@ -79,26 +79,27 @@ namespace Assets.Scripts
             string[] splittedMessage = message?.Split(':') ?? new string[] { message };
             string funcName = splittedMessage?[0];
 
-            GameManager.IsResponseRequested = true;
+            Debug.Log($"FuncName : {funcName} and message : {message}");
 
             if (funcName == "reset")
                 GameManager.ResetGame();
 
             if (funcName == "set_action")
             {
+                GameManager.IsFullAnswerRequested = true;
                 string argument = splittedMessage?[1];
                 AgentAction action = (AgentAction)Enum.Parse(typeof(AgentAction), argument);
                 GameManager.MakeAction(action);
             }
 
             if (funcName == "get_state")
-                await SendAsync(GameManager.GetState().ToString());
+                SendAsync(GameManager.GetState().ToString());
         }
 
-        public async Task ModelSend()
+        public virtual void ModelSend()
         {
             Debug.Log("ModelSend");
-            GameManager.IsResponseRequested = false;
+            GameManager.IsFullAnswerRequested = false;
 
             // Get the reward from the Agent
             float reward = GameManager.GetReward();
@@ -113,45 +114,42 @@ namespace Assets.Scripts
 
             //Debug.Log($"Message : {message}");
             // Send the message
-            await SendAsync(message);
+            SendAsync(message);
 
         }
 
-        public async Task SendAsync(string message)
+        public virtual void SendAsync(string message)
         {
             Debug.Log("Sending...");
             var data = Encoding.ASCII.GetBytes(message);
-            await _stream.WriteAsync(data, 0, data.Length);
+            _stream.WriteAsync(data, 0, data.Length);
             Debug.Log("Sent: " + message);
         }
 
-        public async Task<string> ReceiveAsync()
+        public virtual string Receive()
         {
             Debug.Log("Receiving...");
             string message;
 
             // Read from the stream until the delimiter '\n' is found
-            do
+            var buffer = new List<byte>();
+            var data = new byte[1];
+            while (data[0] != '\n' && buffer.Count <= 0)
             {
-                var buffer = new List<byte>();
-                var data = new byte[1];
-                while (data[0] != '\n' && buffer.Count > 0)
-                {
-                    _stream.Read(data, 0, data.Length);
-                    buffer.AddRange(data);
-                }
-                // Convert the data to a string
-                message = Encoding.ASCII.GetString(buffer.ToArray());
-            } while (string.IsNullOrWhiteSpace(message));
+                _stream.Read(data, 0, data.Length);
+                buffer.AddRange(data);
+            }
+            // Convert the data to a string
+            message = Encoding.ASCII.GetString(buffer.ToArray());
 
             Debug.Log("Received: " + message);
             return message;
         }
-        private async void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (_isServerStarted)
             {
-                await StopServerAsync();
+                StopServerAsync();
             }
         }
 
