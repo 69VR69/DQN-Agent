@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7328960572549680211}
-  - component: {fileID: 5614242086362509770}
-  - component: {fileID: 5783901591710014933}
+  - component: {fileID: 2649652379880715797}
+  - component: {fileID: 6392555397213443731}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 8767458046220087793}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5614242086362509770
+--- !u!114 &2649652379880715797
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,11 +43,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4961936715591903289}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 733ea37ddc9ee9d4e991d11646b72bb1, type: 3}
+  m_Script: {fileID: 11500000, guid: d52b08c71d6189148ad2a47f990f6436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
---- !u!114 &5783901591710014933
+  _jumpForce: 80
+  _moveSpeed: 20
+  _rotationDegree: 90
+--- !u!114 &6392555397213443731
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -56,13 +59,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4961936715591903289}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcc98efe85470574d828b8629695a8f1, type: 3}
+  m_Script: {fileID: 11500000, guid: fd42b127b82b57a409e17519cf4e9873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
-  _jumpForce: 10
-  _moveSpeed: 10
-  _rotationSpeed: 10
 --- !u!1 &7926363616025121949
 GameObject:
   m_ObjectHideFlags: 0
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8767458046220087793}
-  - component: {fileID: 8265748454468108891}
+  - component: {fileID: 3928755706116524260}
   m_Layer: 0
   m_Name: ServerManager
   m_TagString: Untagged
@@ -95,7 +95,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7328960572549680211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8265748454468108891
+--- !u!114 &3928755706116524260
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -104,6 +104,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7926363616025121949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f05066287b61ace48865822485687a95, type: 3}
+  m_Script: {fileID: 11500000, guid: 2c9f8cb12ec89434a9f9395766c14cb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

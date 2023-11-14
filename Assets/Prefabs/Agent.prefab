@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 7093073232125880651}
   - component: {fileID: 1317721061130619115}
   - component: {fileID: 5659161894228013801}
-  - component: {fileID: 437269912706356242}
-  - component: {fileID: 4383943745383758994}
+  - component: {fileID: 900913250672177316}
+  - component: {fileID: 3238686122833920124}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
@@ -136,7 +136,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &437269912706356242
+--- !u!114 &900913250672177316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,10 +145,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 123487553699934641}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 017dddc39165e7447b3f0d1daa43535e, type: 3}
+  m_Script: {fileID: 11500000, guid: 5ec2d6796b239754aa73768b1c21bf35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4383943745383758994
+--- !u!114 &3238686122833920124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,7 +157,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 123487553699934641}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5f740385b74fcd419759603bb008621, type: 3}
+  m_Script: {fileID: 11500000, guid: a37ede9316e1ada40b802b98309a5383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _lidarDistance: 3

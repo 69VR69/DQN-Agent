@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1568931879337232766}
   - component: {fileID: 5534280153654814831}
   - component: {fileID: 7840962362735669284}
-  - component: {fileID: 7624085346652453372}
+  - component: {fileID: 1293346923345529690}
   m_Layer: 0
   m_Name: Goal
   m_TagString: Goal
@@ -106,7 +106,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5008793
   m_Center: {x: 0.028218493, y: -0.27339116, z: 0}
---- !u!114 &7624085346652453372
+--- !u!114 &1293346923345529690
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,8 +115,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 3117012785976785471}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8904aaf960498fc4ab84ec5ee53f286a, type: 3}
+  m_Script: {fileID: 11500000, guid: 798fa3ff188f9ea4ab420199719fc0c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 5534280153654814831}
-  _color: {r: 0.12413847, g: 0.6792453, b: 0, a: 0}
+  _color: {r: 0.062050495, g: 0.7830189, b: 0.097847745, a: 0}
