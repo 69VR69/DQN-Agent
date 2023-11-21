@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private bool _isMockedMode = false;
     public ActionHandler ActionHandler { get; internal set; }
-    public ServerManager ServerManager { get; internal set; }
+    public TcpServer ServerManager { get; internal set; }
     public bool IsFullAnswerRequested { get; internal set; } = false;
     public bool IsDone { get; internal set; } = false;
     public bool IsActionDuring { get; internal set; } = false;
@@ -27,9 +27,9 @@ public class GameManager : MonoBehaviour
         Instance = this;
         ActionHandler = GetComponent<ActionHandler>();
         if (_isMockedMode)
-            ServerManager = GetComponentInChildren<ServerManagerMock>();
+            ServerManager = GetComponentInChildren<TcpServerMock>();
         else
-            ServerManager = GetComponentInChildren<ServerManager>();
+            ServerManager = GetComponentInChildren<TcpServer>();
         ServerManager.GameManager = this;
     }
 
@@ -52,12 +52,5 @@ public class GameManager : MonoBehaviour
         IsActionDuring = true;
         Debug.Log("Make Action");
         ActionHandler.MakeAction(action);
-    }
-
-    private void Update()
-    {
-        //Debug.Log($"is response requested : {IsFullAnswerRequested} and is action during : {IsActionDuring}");
-        if (IsFullAnswerRequested && !IsActionDuring)
-            ServerManager.ModelSend();
     }
 }

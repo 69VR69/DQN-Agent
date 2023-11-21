@@ -23,9 +23,12 @@ namespace Assets.Scripts
             GameManager = GetComponent<GameManager>();
         }
 
-        public virtual void Start()
+        private void Update()
         {
-            StartServer();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StartServer();
+            }
         }
 
         public virtual void OnDestroy()
