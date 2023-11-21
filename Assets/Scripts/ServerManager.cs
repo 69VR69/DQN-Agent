@@ -31,7 +31,7 @@ namespace Assets.Scripts
         {
             Debug.Log("Starting server...");
             if (_isServerStarted)
-                StopServerAsync();
+                StopServer();
 
             _listener = new TcpListener(IPAddress.Parse(Ip), Port);
             _listener.Start();
@@ -43,7 +43,7 @@ namespace Assets.Scripts
             _stream = _client.GetStream();
         }
 
-        protected virtual void StopServerAsync()
+        protected virtual void StopServer()
         {
             Debug.Log("Stopping server...");
             _stream?.Close();
@@ -149,7 +149,7 @@ namespace Assets.Scripts
         {
             if (_isServerStarted)
             {
-                StopServerAsync();
+                StopServer();
             }
         }
 

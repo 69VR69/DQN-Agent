@@ -61,7 +61,7 @@ namespace Assets.Scripts
         {
             Debug.Log("Starting server...");
             if (_isServerStarted)
-                StopServerAsync();
+                StopServer();
 
             _isServerStarted = true;
             Debug.Log("Server started");
@@ -107,7 +107,7 @@ namespace Assets.Scripts
             return message;
         }
 
-        protected override void StopServerAsync()
+        protected override void StopServer()
         {
             Debug.Log("Stopping server...");
             _isServerStarted = false;
@@ -115,8 +115,6 @@ namespace Assets.Scripts
             string data = StreamMessages.Select(s => $"[{s.Item2} -> {s.Item1}]").Aggregate((s1, s2) => s1 + '\n' + s2);
             Debug.Log("Result of the communication has been :");
             Debug.Log(data);
-
-            Task.Delay(1000);
         }
 
         protected override void Update()
