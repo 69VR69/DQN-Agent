@@ -23,7 +23,7 @@ namespace Assets.Scripts
             GameManager = GetComponent<GameManager>();
         }
 
-        private void Update()
+        public virtual void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {

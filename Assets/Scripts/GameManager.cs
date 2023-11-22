@@ -26,10 +26,18 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
         ActionHandler = GetComponent<ActionHandler>();
-        if (_isMockedMode)
-            ServerManager = GetComponentInChildren<TcpServerMock>();
+
+        var mocked = GetComponentInChildren<TcpServerMock>();
+        var real = GetComponentInChildren<TcpServer>();
+
+        if (!_isMockedMode)
+        {
+            mocked.gameObject.SetActive(false);
+            ServerManager = real;
+        }
         else
-            ServerManager = GetComponentInChildren<TcpServer>();
+            ServerManager = mocked;
+
         ServerManager.GameManager = this;
     }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 
 using UnityEngine;
 
@@ -9,6 +8,7 @@ namespace Assets.Scripts
     {
         [SerializeField]
         private List<string> simulatedReceivedDataList = new List<string>();
+        private int currentDataIndex = 0;
 
         private List<string> messageLogs = new List<string>();
 
@@ -16,6 +16,29 @@ namespace Assets.Scripts
         {
             isServerRunning = true;
             Debug.Log("Mock Server started.");
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                // Simulate receiving a message
+                if (currentDataIndex < simulatedReceivedDataList.Count)
+                {
+                    string simulatedMessage = simulatedReceivedDataList[currentDataIndex];
+
+                    // Process the simulated received data
+                    ProcessReceivedMessage(simulatedMessage);
+
+                    currentDataIndex++;
+                }
+                else
+                {
+                    Debug.Log("No more simulated messages.");
+                }
+            }
         }
 
         public override void StopServer()
@@ -31,18 +54,11 @@ namespace Assets.Scripts
             messageLogs.Add("Sent: " + data);
         }
 
-        public override void HandleClientComm(object clientObj)
+        public override void ProcessReceivedMessage(string message)
         {
-            Debug.Log("Mock Client Connected.");
-
-            foreach (string simulatedData in simulatedReceivedDataList)
-            {
-                // Process the simulated received data
-                ProcessReceivedMessage(simulatedData);
-
-                // Simulate a delay between messages (replace this with your own logic)
-                Thread.Sleep(1000);
-            }
+            Debug.Log("Mock Received: " + message);
+            messageLogs.Add("Received: " + message);
+            // Add your logic here to handle the received message
         }
 
         public void DisplayMessageLogs()
