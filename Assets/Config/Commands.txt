@@ -1,0 +1,1 @@
+cls & mlagents - learn "D:\document\Unity_Projects\DQN Agent\Assets\Config\platform_config.yaml"--run - id = cubeAgentMaze6

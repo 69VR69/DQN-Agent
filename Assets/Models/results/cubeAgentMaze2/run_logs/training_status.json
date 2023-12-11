@@ -1,0 +1,29 @@
+{
+    "Bob": {
+        "checkpoints": [
+            {
+                "steps": 9719,
+                "file_path": "results\\cubeAgentMaze2\\Bob\\Bob-9719.onnx",
+                "reward": null,
+                "creation_time": 1702228995.5429947,
+                "auxillary_file_paths": [
+                    "results\\cubeAgentMaze2\\Bob\\Bob-9719.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 9719,
+            "file_path": "results\\cubeAgentMaze2\\Bob.onnx",
+            "reward": null,
+            "creation_time": 1702228995.5429947,
+            "auxillary_file_paths": [
+                "results\\cubeAgentMaze2\\Bob\\Bob-9719.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "2.1.1+cpu"
+    }
+}
