@@ -19,6 +19,7 @@ public class CubeAgent : Unity.MLAgents.Agent
 
     [SerializeField]
     private List<GameObject> _checkpoints;
+    private GameObject _nextCheckPoint = null;
 
     private List<Vector3> _oldPositions = new List<Vector3>();
     private float gamma = 0.009f;
@@ -76,7 +77,7 @@ public class CubeAgent : Unity.MLAgents.Agent
         _rb.velocity = Vector3.Lerp(_rb.velocity, controlSignal * 5f, Time.deltaTime * 5f);
 
         // Old positions
-        _oldPositions.Add(transform.position);
+        //_oldPositions.Add(transform.position);
 
         // Rewards
         if (!IsOnGround())
@@ -85,38 +86,55 @@ public class CubeAgent : Unity.MLAgents.Agent
             EndEpisode();
         }
 
-        // Reward for going in the direction of the goal
-        if (_oldPositions.Count > 100)
+
+        // Calculate the percentage of the distance to the goal from the initial position
+        float distanceToGoal = Vector3.Distance(transform.position, _goal.transform.position);
+        float distanceFromInitialPosition = Vector3.Distance(transform.position, _initialPosition);
+        float percentage = (float)Math.Pow(distanceFromInitialPosition / distanceToGoal, 2);
+        SetReward(percentage);
+
+        // Calculate the percentage of the distance to the next checkpoint from the initial position
+        if (_nextCheckPoint == null)
         {
-            float distanceToGoal = Vector3.Distance(transform.position, _goal.transform.position);
-            float oldDistanceToGoal = Vector3.Distance(_oldPositions.Last(), _goal.transform.position);
-            float reward = (oldDistanceToGoal - distanceToGoal) * 10f;
-            SetReward(reward);
-
-
-            // Add penalty for going in the direction of the old positions
-            float cumulativeDistanceToOldPositions = 0f;
-            for (int i = 0; i < _oldPositions.Count; i++)
-                cumulativeDistanceToOldPositions += Vector3.Distance(transform.position, _oldPositions[i]) * (i * gamma);
-            cumulativeDistanceToOldPositions /= _oldPositions.Count;
-
-            // Debug.Log($"cumulativeDistanceToOldPositions: {cumulativeDistanceToOldPositions}");
-            SetReward(cumulativeDistanceToOldPositions);
+            _nextCheckPoint = _checkpoints.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).First();
         }
+        float distanceToNextCheckPoint = Vector3.Distance(transform.position, _nextCheckPoint.transform.position);
+        float percentageToNextCheckPoint = (float)Math.Pow(distanceFromInitialPosition / distanceToNextCheckPoint, 4);
+        SetReward(percentageToNextCheckPoint);
 
-        //Reward for going far from initial position
-        float distanceFromInitialPosition = Vector3.Distance(transform.position, _initialPosition) * 10f;
-        //Debug.Log($"distanceFromInitialPosition: {distanceFromInitialPosition}");
-        SetReward(distanceFromInitialPosition);
 
-        // Remove the 500 oldest positions on 5000
-        if (_oldPositions.Count > 1000)
-            _oldPositions.RemoveAt(0);
+        //// Reward for going in the direction of the goal
+        //if (_oldPositions.Count > 100)
+        //{
+        //    float distanceToGoal = Vector3.Distance(transform.position, _goal.transform.position);
+        //    float oldDistanceToGoal = Vector3.Distance(_oldPositions.Last(), _goal.transform.position);
+        //    float reward = (oldDistanceToGoal - distanceToGoal) * 10f;
+        //    SetReward(reward);
 
-        //Debug.Log($"Reward: {GetCumulativeReward()}");
+
+        //    //// Add penalty for going in the direction of the old positions
+        //    //float cumulativeDistanceToOldPositions = 0f;
+        //    //for (int i = 0; i < _oldPositions.Count; i++)
+        //    //    cumulativeDistanceToOldPositions += Vector3.Distance(transform.position, _oldPositions[i]) * (i * gamma);
+        //    //cumulativeDistanceToOldPositions /= _oldPositions.Count;
+
+        //    //Debug.Log($"cumulativeDistanceToOldPositions: {cumulativeDistanceToOldPositions}");
+        //    //SetReward(cumulativeDistanceToOldPositions);
+        //}
+
+        //////Reward for going far from initial position
+        ////float distanceFromInitialPosition = Vector3.Distance(transform.position, _initialPosition) * 10f;
+        ////Debug.Log($"distanceFromInitialPosition: {distanceFromInitialPosition}");
+        ////SetReward(distanceFromInitialPosition);
+
+        //// Remove the 500 oldest positions on 5000
+        //if (_oldPositions.Count > 1000)
+        //    _oldPositions.RemoveAt(0);
+
+        Debug.Log($"Reward: {GetCumulativeReward()}");
 
         // Add time penalty
-        // SetReward(-0.01f);
+        //SetReward(-0.01f);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -136,6 +154,7 @@ public class CubeAgent : Unity.MLAgents.Agent
         {
             SetReward(10f);
             other.SetActive(false);
+            _nextCheckPoint = _checkpoints.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).First();
         }
     }
 
